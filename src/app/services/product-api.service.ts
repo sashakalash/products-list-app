@@ -1,9 +1,12 @@
-import { inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, of } from 'rxjs';
 import { environment } from '@app/environments/environment';
 import { IProduct, IProductCategory } from '@app/interfaces/product.interface';
 
+@Injectable({
+  providedIn: 'root',
+})
 export class ProductApiService {
   private environment = environment;
   private apiUrl = this.environment.apiUrl;
@@ -11,23 +14,22 @@ export class ProductApiService {
 
   getProducts(): Observable<IProduct[]> {
     return this.http.get<any>(`${this.apiUrl}/${this.environment.api.getProducts}`).pipe(
-      map(({ data }) => data.plots),
+      map(({ products }) => products),
       catchError(() => of([]))
     );
   }
 
-  getByCategory(category: string): Observable<IProduct[]> {
+  getProductsByCategory(category: string): Observable<IProduct[]> {
     return this.http
-      .get<any>(`${this.apiUrl}/${this.environment.api.getProducts.replace('${{category}}', category)}`)
+      .get<any>(`${this.apiUrl}/${this.environment.api.getProductsByCategory.replace('${{category}}', category)}`)
       .pipe(
-        map(({ data }) => data.plots),
+        map(({ products }) => products),
         catchError(() => of([]))
       );
   }
 
   getProductCategories(): Observable<IProductCategory[]> {
     return this.http.get<any>(`${this.apiUrl}/${this.environment.api.getProductCategories}`).pipe(
-      map(({ data }) => data.plots),
       catchError(() => of([]))
     );
   }
