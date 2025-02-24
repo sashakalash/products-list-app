@@ -15,27 +15,45 @@ type ProductsState = {
   products: IProduct[];
   categories: IProductCategory[];
   isLoading: boolean;
-  filter: { query: string; };
+  filter: { query: string };
+  favorite: Set<IProduct>;
 };
 
 const initialState: ProductsState = {
   products: [],
   categories: [],
-  isLoading: false,
+  isLoading: true,
   filter: { query: '' },
+  favorite: new Set<IProduct>(),
 };
 
 export const ProductsStore = signalStore(
+  { providedIn: 'root' },
   withDevtools('products-store'),
   withState(() => inject(PRODUCTS_STATE)),
   withMethods((store, productApiService = inject(ProductApiService)) => ({
     setFilter(query: string): void {
-      patchState(store, (state) => ({ filter: { ...state.filter, query } }));
+      patchState(store, () => ({ filter: { query } }));
       if (query) {
         this.loadByQuery(query);
       } else {
         this.loadAll(store);
       }
+    },
+    addToFavorite(product: IProduct): void {
+      patchState(store, (state) => {
+        const favorite = state.favorite.add(product);
+        return { favorite: new Set(favorite) }
+    });
+    },
+    removeFromFavorite(product: IProduct): void {
+      patchState(store, (state) => {
+        const favorite = state.favorite;
+        if (favorite.has(product)) {
+          favorite.delete(product);
+        }
+        return { favorite: new Set(favorite) };
+      });
     },
     loadAll: rxMethod(
       pipe(
@@ -57,7 +75,7 @@ export const ProductsStore = signalStore(
       pipe(
         tap(() => patchState(store, { isLoading: true })),
         switchMap(() => {
-          return productApiService.getByCategory(store.filter.query()).pipe(
+          return productApiService.getProductsByCategory(store.filter.query()).pipe(
             tapResponse({
               next: (products: IProduct[]) => patchState(store, { products, isLoading: false }),
               error: (err) => {

@@ -3,8 +3,8 @@ export const environment = {
   appName: 'Product Listing',
   apiUrl: 'https://dummyjson.com',
   api: {
-    getProducts: 'products',
-    getByCategory: 'products/categories/${{category}}',
-    getProductCategories: 'products/categories'
+    getProducts: 'products/?delay=1000',
+    getProductsByCategory: 'products/category/${{category}}/?delay=1000',
+    getProductCategories: 'products/categories/?delay=1000'
   },
 };
