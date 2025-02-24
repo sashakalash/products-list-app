@@ -99,8 +99,3 @@ GET https://dummyjson.com/products/categories
     "url": "https://dummyjson.com/products/category/furniture"
   }]
   ```
-
----
-
-## 📜 License
-This project is **MIT licensed**.
